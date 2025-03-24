@@ -1,22 +1,10 @@
-use axum::{
-    routing::get,
-    Router,
-};
-use std::net::SocketAddr;
+mod routes;
+mod handlers;
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(handler));
-    let address = SocketAddr::from(([0,0, 0, 0], 8000));
-    println!("Server running on http://{}", address);
-    
-    axum::Server::bind(&address)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
-}
-
-
-async  fn handler() -> &'static str {
-    return "Hello Server!\n";
+    let app = routes::routes::create_router();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    println!("Server running!");
+    axum::serve(listener, app).await.unwrap();
 }
