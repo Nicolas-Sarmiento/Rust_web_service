@@ -32,7 +32,6 @@ pub async fn download_img() -> impl IntoResponse {
     }
 }
 
-/// Obtiene una lista de imágenes en un directorio
 fn get_random_img_path(dir: &str) -> Result<Option<String>, std::io::Error> {
     let mut imgs = Vec::new();
     let path = Path::new(dir);
