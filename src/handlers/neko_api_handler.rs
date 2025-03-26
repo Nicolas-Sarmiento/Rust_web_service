@@ -35,7 +35,7 @@ pub async fn neko_api_img(Json(payload): Json<InputBody>) -> impl IntoResponse {
         return (StatusCode::BAD_REQUEST, "Empty quest type Valid quest_types:[neko, food, coffee]").into_response();
     }
     if payload.sfw {
-        if !matches!(payload.quest_type.as_str(), | "neko" | "food" | "coffee"){
+        if !matches!(payload.quest_type.as_str(), | "neko" | "food" | "coffee" | "kanna"){
             return (StatusCode::BAD_REQUEST, "Not valid SFW quest_types:[neko, food, coffee]").into_response();
         }
     }

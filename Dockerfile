@@ -9,6 +9,7 @@ COPY ./src ./src
 RUN cargo build --release
 
 COPY ./uploads ./uploads
+COPY ./nekos ./nekos
 
 FROM debian:bookworm-slim
 
@@ -20,6 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/target/release/web_service_example .
 COPY --from=builder /app/uploads ./uploads
+COPY --from=builder /app/nekos ./nekos
 
 EXPOSE 3000
 

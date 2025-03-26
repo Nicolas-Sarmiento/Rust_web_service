@@ -1,20 +1,12 @@
 use std::fs;
 use std::path::Path;
-use axum::{http::{header, StatusCode}, response::IntoResponse};
+use axum::{http::{header, StatusCode}, response::{IntoResponse, Response}, extract::Path as Pth};
 use rand::seq::IndexedRandom;
 use tokio::fs as async_fs;
 use mime_guess;
 
 
-pub async fn download_img() -> impl IntoResponse {
-
-    let file_path = match get_random_img_path("uploads") {
-        Ok(Some(path)) => path,
-        Ok(None) => return (StatusCode::NOT_FOUND, "No images found!").into_response(),
-        Err(_) => return (StatusCode::NOT_FOUND, "No images found!").into_response()
-    };
-    
-
+async fn download_img(file_path: String) ->  Response {
     if !Path::new(&file_path).exists() {
         return (StatusCode::NOT_FOUND, "File not found!").into_response();
     }
@@ -28,11 +20,13 @@ pub async fn download_img() -> impl IntoResponse {
                 contents,
             ).into_response()
         },
-        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Error al leer el archivo").into_response(),
+        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Error at reading the file").into_response(),
     }
+
 }
 
 fn get_random_img_path(dir: &str) -> Result<Option<String>, std::io::Error> {
+
     let mut imgs = Vec::new();
     let path = Path::new(dir);
 
@@ -48,8 +42,30 @@ fn get_random_img_path(dir: &str) -> Result<Option<String>, std::io::Error> {
                     }
                 }
             }
+            
         }
     }
 
     Ok(imgs.choose(&mut rand::rng()).cloned())
 }
+
+
+
+pub async fn download_neko() -> impl IntoResponse {
+
+    let file_path = match get_random_img_path("nekos") {
+        Ok(Some(path)) => path,
+        Ok(None) => return (StatusCode::NOT_FOUND, "No images found!").into_response(),
+        Err(_) => return (StatusCode::NOT_FOUND, "No images found!").into_response()
+    };
+    
+    download_img(file_path).await
+    
+}
+
+pub async fn get_img(Pth(file_name): Pth<String>) -> impl IntoResponse {
+    let file_path: String = format!("uploads/{}",file_name);
+    println!("{}", file_path);
+    download_img(file_path).await
+}
+
